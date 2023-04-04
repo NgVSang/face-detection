@@ -11,10 +11,14 @@ import { accessLogStream } from './configs';
 import { ENVIRONMENT } from './utils/secrets';
 import { ENV } from './constants';
 import { detectFace, init } from './utils/face-recognition';
+import {connectDatabase} from './configs/db.config';
+import {errorConverter, handleError, handleNotFound} from './middlewares/error.middleware';
+import apiRoutes from './routes/index.routes'
 
 const app = express();
 
-init();
+// init();
+connectDatabase()
 
 app.set('port', PORT || 9000);
 
@@ -50,6 +54,13 @@ app.post('/detect', upload.single('file'), async (req: Request, res: Response, n
 
   res.json(labels);
 });
+
+//routes
+app.use("/api", apiRoutes);
+
+app.use(errorConverter);
+app.use(handleError);
+app.use(handleNotFound);
 
 if (ENVIRONMENT === ENV.DEV) {
   app.use(cors({ origin: CLIENT_URL }));
