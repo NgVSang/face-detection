@@ -95,6 +95,7 @@ const imageTraining =async (req: Request, res: Response) => {
                 faceapi.nets.faceLandmark68Net.loadFromDisk(MODAL_PATH),
                 faceapi.nets.faceRecognitionNet.loadFromDisk(MODAL_PATH),
             ]);
+            console.log('Loading training data...');
             for (let i = 0; i < user.imageTraining.length ; i ++){
                 // for (let i = 0; i < 1 ; i ++){
                 // arr.push(path.join(__dirname, 'src/public/userImages/',user.imageTraining[i]))

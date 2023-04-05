@@ -42,9 +42,13 @@ const faceDetect = async (req: Request, res: Response) => {
             faceapi.nets.faceLandmark68Net.loadFromDisk(MODAL_PATH),
             faceapi.nets.faceRecognitionNet.loadFromDisk(MODAL_PATH),
         ]);
+        console.log('Loading training data...');
         let labels: any[] = [];
         if (req.file?.buffer) {
             labels = await detectFace(req.file?.buffer);
+            if (labels.includes("unknown")) {
+                return res.status(200).json(response({ result: labels }, "Không tìm được người phù hợp", 0));
+            }
             if ( labels.length > 0 ){
                 const listUserDetect: any[] = []
                 for (let i = 0 ; i< labels.length ; i++ ){
@@ -93,8 +97,11 @@ const detectFace = async (imageData: Buffer) => {
     
     const labels = await Promise.all(
       detections.map(async (detection) => {
-        // @ts-ignore
-        return faceMatcher.findBestMatch(detection.descriptor).label;
+        const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+        if (bestMatch.distance > maxDescriptorDistance) {
+          return 'unknown';
+        }
+        return bestMatch.label;
       })
     );
     return labels;
