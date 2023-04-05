@@ -5,6 +5,8 @@ import userRoute from './user/users.routes'
 import adminRoute from './admin/admin.routes'
 import * as authorization from '../middlewares/authorization.middleware'
 import * as userController from '../controllers/users.controller'
+import * as adminController from '../controllers/admin.controller'
+import {uploadFileMiddleware} from '../utils/saveImage';
 
 const router = express.Router();
 
@@ -23,6 +25,6 @@ adminRoutes.forEach((route) => {
     router.use(route.path, authorization.checkAdmin , route.route);
 });
 
-router.post('/test',userController.test)
+router.post('/test',adminController.testAddImage)
 
 export default router;

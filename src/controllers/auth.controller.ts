@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express"
 import response from "../utils/response"
 import User from '../models/users.model'
 import * as userService from '../services/user.service'
-import bcrypt from 'bcrypt'
 import {createToken} from "../services/jsonwebtoken.service"
+import {SECRET_KEY} from "../config"
 
 
 const login = async (req: Request, res: Response) => {
@@ -13,7 +13,7 @@ const login = async (req: Request, res: Response) => {
         })
         await userService.checkPassword(user?.password || "", req.body.password || "");
         const token = createToken({
-            secret_key: process.env.SECRET_KEY || "asdfad",
+            secret_key: SECRET_KEY || "asdfad",
             data:{
                 id: user?.id || '',
                 name: user?.name || '',
@@ -30,21 +30,6 @@ const login = async (req: Request, res: Response) => {
     }
 }
 
-const createUser = async (req: Request, res: Response) => {
-    try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const user = await User.create({
-            ...req.body,
-            password: hashedPassword
-        });
-        return res.status(200).json(response({ user: user}, "Success", 1));
-    } catch (error: any) {
-        console.log("here");
-        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
-    }
-}
-
 export {
     login,
-    createUser
 }

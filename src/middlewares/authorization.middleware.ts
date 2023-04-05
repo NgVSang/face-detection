@@ -1,7 +1,8 @@
 import response from "../utils/response"
-import { NextFunction, Response } from "express";
+import { NextFunction, Response , Request} from "express";
 import httpStatus from "http-status";
 import {verifyToken} from "../services/jsonwebtoken.service";
+import {SECRET_KEY} from "../config";
 
 const checkEmployee = (req: any, res: Response, next: NextFunction) => {
     const { authorization } = req.headers;
@@ -9,7 +10,7 @@ const checkEmployee = (req: any, res: Response, next: NextFunction) => {
         return res.status(httpStatus.UNAUTHORIZED).json(response({}, "Không có quyền truy cập", 0));
     }
     const token = authorization.split(" ")[1];
-    const verify = verifyToken(process.env.SECRET_KEY || "", token);
+    const verify = verifyToken(SECRET_KEY, token);
     if (verify.err) {
         return res
             .status(httpStatus.UNAUTHORIZED)
@@ -19,19 +20,20 @@ const checkEmployee = (req: any, res: Response, next: NextFunction) => {
     next();
 };
 
-const checkAdmin = (req: any, res: Response, next: NextFunction) => {
+const checkAdmin = (req: Request, res: Response, next: NextFunction) => {
     const { authorization } = req.headers;
     if (!authorization) {
         return res.status(httpStatus.UNAUTHORIZED).json(response({}, "Không có quyền truy cập", 0));
     }
     const token = authorization.split(" ")[1];
-    const verify = verifyToken(process.env.SECRET_KEY || "", token);
+    const verify = verifyToken(SECRET_KEY, token);
     //@ts-ignore
     if (verify.err || verify.user.role == 1 ) {
         return res
             .status(httpStatus.UNAUTHORIZED)
             .json(response({ type: "EXPIRED" }, "Không có quyền truy cập", 0));
     }
+    //@ts-ignore
     req.user = verify.user;
     next();
 };

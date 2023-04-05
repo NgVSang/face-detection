@@ -13,6 +13,7 @@ export const CLIENT_URL = NODE_ENV === ENV.PRODUCT ? process.env.CLIENT_URL_PROD
 export const JWT_SECRET = NODE_ENV === ENV.PRODUCT ? process.env.CLIENT_URL_PRODUCT : process.env.JWT_SECRET_DEV;
 export const JWT_LIFETIME = process.env.JWT_LIFETIME;
 export const LOG_FILE = process.env.LOG_FILE || 'access.log';
+export const SECRET_KEY = process.env.SECRET_KEY || 'access.log';
 export const ACCESS_LOG_STREAM_INTERVAL = process.env.ACCESS_LOG_STREAM_INTERVAL || '1d';
 export const SESSION_SECRET = process.env.SESSION_SECRET;
 //# sourceMappingURL=config.js.map

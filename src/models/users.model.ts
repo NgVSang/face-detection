@@ -15,6 +15,8 @@ export interface UserInterface extends Document {
   attendances: string[] | AttendanceInterface[]
   workings: string[] | WorkingInterface[]
   phoneNumber?: string
+  imageTraining: string[]
+  faceDescriptors: any[]
   createdAt: Date
   updatedAt: Date
 }
@@ -30,7 +32,9 @@ const UserSchema: Schema = new Schema(
     payrolls:[{ type: mongoose.Schema.Types.ObjectId, ref: 'payroll' }],
     workings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'working' }],
     attendances:[{ type: mongoose.Schema.Types.ObjectId, ref: 'attendances' }],
+    imageTraining:[{ type: String, required:false }],
     baseSalary: {type: Number, required: false, default: 3500000},
+    faceDescriptors: [{type: [],required: false}],
     role: { type: Number, required: false, default: 1 },
   },
   { timestamps: true }

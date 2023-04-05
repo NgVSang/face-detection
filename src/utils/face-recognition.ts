@@ -13,8 +13,8 @@ let faceMatcher: any;
 const MODAL_PATH = path.join(__dirname, 'lib');
 
 export const loadTrainingData = async () => {
-  const labels = ['Bui_Hong_Phuoc', 'Chu Duc Anh', 'Ng Tan Khoa'];
-  // const labels = ['Chu Duc Anh',];
+  // const labels = ['Bui_Hong_Phuoc', 'Chu Duc Anh', 'Ng Tan Khoa'];
+  const labels = ['Bui_Hong_Phuoc',];
   const faceDescriptors: any[] = [];
   for (const label of labels) {
     const descriptors: any[] = [];
@@ -43,7 +43,7 @@ export const init = async () => {
 
   trainingData = await loadTrainingData();
   faceMatcher = new faceapi.FaceMatcher(trainingData, 0.6);
-
+  console.log(trainingData);
   console.log('Training data complete!');
 };
 
