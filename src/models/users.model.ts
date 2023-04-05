@@ -34,7 +34,7 @@ const UserSchema: Schema = new Schema(
     attendances:[{ type: mongoose.Schema.Types.ObjectId, ref: 'attendances' }],
     imageTraining:[{ type: String, required:false }],
     baseSalary: {type: Number, required: false, default: 3500000},
-    faceDescriptors: [{type: [],required: false}],
+    faceDescriptors: {type: Object,required: false},
     role: { type: Number, required: false, default: 1 },
   },
   { timestamps: true }

@@ -17,5 +17,10 @@ router.post(
     adminController.addImageForUser
 )
 
+router.post(
+    "/training-user/:userId", 
+    adminController.imageTraining
+)
+
 
 export default router

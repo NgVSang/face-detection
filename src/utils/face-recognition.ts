@@ -18,7 +18,7 @@ export const loadTrainingData = async () => {
   const faceDescriptors: any[] = [];
   for (const label of labels) {
     const descriptors: any[] = [];
-    for (let i = 3; i <= 10; i++) {
+    for (let i = 3; i <= 5; i++) {
       const img = await loadImage(path.join(__dirname, 'labeled_images', label, `${i}.jpg`));
       // @ts-ignore
       const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
@@ -28,6 +28,7 @@ export const loadTrainingData = async () => {
         console.log("ảnh ",i," không thể thấy mặt");
       }
     }
+    console.log(descriptors);
     faceDescriptors.push(new faceapi.LabeledFaceDescriptors(label, descriptors));
   }
 
@@ -42,6 +43,7 @@ export const init = async () => {
   ]);
 
   trainingData = await loadTrainingData();
+  console.log(trainingData);
   faceMatcher = new faceapi.FaceMatcher(trainingData, 0.6);
   console.log(trainingData);
   console.log('Training data complete!');
