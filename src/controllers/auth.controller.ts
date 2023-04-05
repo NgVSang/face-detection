@@ -92,19 +92,25 @@ const detectFace = async (imageData: Buffer) => {
         faceDescriptors.push(new faceapi.LabeledFaceDescriptors(trainingData[i].id as string, arrFloat32))
     }
     const labeledDescriptors = faceDescriptors;
-    const maxDescriptorDistance = 0.6;
+    const maxDescriptorDistance = 0.5;
     const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, maxDescriptorDistance);
-    
-    const labels = await Promise.all(
-      detections.map(async (detection) => {
+
+    const labeledResults = detections.map((detection) => {
         const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-        if (bestMatch.distance > maxDescriptorDistance) {
-          return 'unknown';
-        }
-        return bestMatch.label;
-      })
-    );
-    return labels;
+        return {
+          detection,
+          label: bestMatch.label,
+          distance: bestMatch.distance
+        };
+      });
+    console.log(labeledResults);
+    const results = labeledResults.map((result) => {
+        return result.label
+        //   box: result.detection.box,
+        //   label: result.label,
+        //   distance: result.distance
+      });
+    return results;
     // return trainingData;
   };
 
