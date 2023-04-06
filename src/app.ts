@@ -14,9 +14,10 @@ import { detectFace, init } from './utils/face-recognition';
 import {connectDatabase} from './configs/db.config';
 import {errorConverter, handleError, handleNotFound} from './middlewares/error.middleware';
 import apiRoutes from './routes/index.routes'
+import {monkeyPatchFaceApiEnv} from './utils/monkeyPatch';
 
 const app = express();
-
+monkeyPatchFaceApiEnv();
 // init();
 connectDatabase()
 
