@@ -1,11 +1,14 @@
-import { Response } from "express"
+import { Response, Request } from "express"
 import response from "../utils/response";
 import Attendance from '../models/attendance.model'
+import * as userService from '../services/user.service'
 import User from '../models/users.model'
 import CronJob from 'node-cron'
 import {timeConvert} from "../utils/timeConvert";
 import dayjs from 'dayjs'
+import bcrypt from 'bcrypt'
 import Working from "../models/working.model";
+import {uploadFileMiddleware} from "../utils/saveImage";
 
 const countingTimeWorkInDay = async () => {
     const scheduledNotifications = CronJob.schedule("0 * * * * *", async () => {
@@ -188,11 +191,60 @@ const getWorking = async (req: any, res: Response) => {
     }
 }
 
+const changePassword =  async (req: any, res: Response) => {
+    try {
+        const { user } = req
+        const { oldPassword, newPassword, confirmPassword } = req.body
+        if (newPassword !== confirmPassword) {
+            return res.status(200).json(response({}, "Mật khẩu không hợp lệ.", 0));
+        }else {
+            const findUser = await User.findById(user?.id || '')
+            await userService.checkPassword(findUser?.password || "", oldPassword || "");
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            await User.findByIdAndUpdate(findUser?.id || '',{
+                password: hashedPassword
+            })
+            return res.status(200).json(response({ }, "Đổi mật khẩu thành công", 1));
+        }
+    } catch (error: any) {
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
+const updateProfile =  async (req: any, res: Response) => {
+    try {
+        await uploadFileMiddleware(req,res)
+        const { user } = req
+        const { email, phoneNumber , name } = req.body
+        let imageUrl = "images/default.jpg"
+        if (req?.files?.length) {
+            await User.findByIdAndUpdate(user.id,{
+                email:email,
+                phoneNumber: phoneNumber,
+                name: name,
+                profilePicture: 'userImages/'+ req?.files[0].filename
+            })
+            imageUrl= 'userImages/'+ req?.files[0].filename
+        }else {
+            await User.findByIdAndUpdate(user.id,{
+                email:email,
+                phoneNumber: phoneNumber,
+                name: name,
+            })
+        }
+        return res.status(200).json(response({imageUrl: imageUrl}, "Cập nhập thông tin thành công", 1));
+    } catch (error: any) {
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
 export {
     attendance,
     countingTimeWorkInDay,
     test,
     countingSalary,
     getAttendance,
-    getWorking
+    getWorking,
+    changePassword,
+    updateProfile,
 }

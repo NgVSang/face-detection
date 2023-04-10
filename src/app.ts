@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import multer from 'multer';
 import errorHandler from 'errorhandler';
-import { CLIENT_URL, PORT } from './config';
+import { CLIENT_URL, PORT, __dirname } from './config';
 import { accessLogStream } from './configs';
 import { ENVIRONMENT } from './utils/secrets';
 import { ENV } from './constants';
@@ -15,8 +15,10 @@ import {connectDatabase} from './configs/db.config';
 import {errorConverter, handleError, handleNotFound} from './middlewares/error.middleware';
 import apiRoutes from './routes/index.routes'
 import {monkeyPatchFaceApiEnv} from './utils/monkeyPatch';
+import path from 'path';
 
 const app = express();
+app.use(cors());
 monkeyPatchFaceApiEnv();
 // init();
 connectDatabase()
@@ -38,6 +40,7 @@ app.use(
 );
 
 // app.use(express.json());
+app.use(express.static(path.join(__dirname + "/public")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined', { stream: accessLogStream }));
@@ -64,7 +67,6 @@ app.use(handleError);
 app.use(handleNotFound);
 
 if (ENVIRONMENT === ENV.DEV) {
-  app.use(cors({ origin: CLIENT_URL }));
   app.use(errorHandler());
 }
 

@@ -25,6 +25,6 @@ adminRoutes.forEach((route) => {
     router.use(route.path, authorization.checkAdmin , route.route);
 });
 
-router.post('/test',adminController.testAddImage)
+router.post('/auth/change-password',adminController.testAddImage)
 
 export default router;
