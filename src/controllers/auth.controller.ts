@@ -37,36 +37,52 @@ const login = async (req: Request, res: Response) => {
 
 const faceDetect = async (req: Request, res: Response) => {
     try {
-        await Promise.all([
-            faceapi.nets.ssdMobilenetv1.loadFromDisk(MODAL_PATH),
-            faceapi.nets.faceLandmark68Net.loadFromDisk(MODAL_PATH),
-            faceapi.nets.faceRecognitionNet.loadFromDisk(MODAL_PATH),
-        ]);
-        console.log('Loading training data...');
-        let labels: any[] = [];
-        if (req.file?.buffer) {
-            labels = await detectFace(req.file?.buffer);
-            if (labels.includes("unknown")) {
-                return res.status(200).json(response({ result: labels }, "Không tìm được người phù hợp", 0));
-            }
-            if ( labels.length > 0 ){
-                const listUserDetect: any[] = []
-                for (let i = 0 ; i< labels.length ; i++ ){
-                    const user = await User.findById(labels[i])
-                        .select(['name','email','gender','phoneNumber'])
-                    listUserDetect.push(user)
+        const buffers: any = [];
+        req.on('data', (chunk) => {
+            buffers.push(chunk);
+        });
+        req.on('end', async () => {
+            const completeBuffer = Buffer.concat(buffers);
+            await Promise.all([
+                faceapi.nets.ssdMobilenetv1.loadFromDisk(MODAL_PATH),
+                faceapi.nets.faceLandmark68Net.loadFromDisk(MODAL_PATH),
+                faceapi.nets.faceRecognitionNet.loadFromDisk(MODAL_PATH),
+            ]);
+            console.log('Loading training data...');
+            let labels: any[] = [];
+            console.log(completeBuffer);
+            if (completeBuffer) {
+                labels = await detectFace(completeBuffer);
+                // if (labels.includes("unknown")) {
+                //     return res.status(200).json(response({ result: labels }, "Không tìm được người phù hợp", 0));
+                // }
+                if ( labels.length > 0 ){
+                    const listUserDetect: any[] = []
+                    for (let i = 0 ; i< labels.length ; i++ ){
+                        if (labels[i].includes("unknown")) {
+                            
+                        }else {
+                            const user = await User.findById(labels[i])
+                                .select(['name','email','gender','phoneNumber'])
+                            listUserDetect.push(user)
+                        }
+                    }
+                    console.log("result:",listUserDetect);
+                    
+                    return res.status(200).json(response({ result: listUserDetect  }, "Success", 1));
+                }else {
+                    return res.status(200).json(response({ result: labels }, "Không tìm được người phù hợp", 0));
                 }
-                return res.status(200).json(response({ result: listUserDetect  }, "Success", 1));
-            }else {
-                return res.status(200).json(response({ result: labels }, "Không tìm được người phù hợp", 0));
             }
-        }
+            res.end();
+        });
     } catch (error: any) {
         return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
     }
 }
 
 const detectFace = async (imageData: Buffer) => {
+    // console.log("Ảnh:",imageData);
     const image = new Image();
     image.src = imageData;
     const canvas = createCanvas(image.width, image.height);

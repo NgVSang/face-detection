@@ -10,7 +10,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.post("/login", validator(authValidation.loginSchema, "body"), authController.login);
-router.post("/detect", upload.single('file'), authController.faceDetect);
+// router.post("/detect", upload.single('file'), authController.faceDetect);
 // router.post("/login",  authController.login);
+router.post("/detect", authController.faceDetect);
 
 export default router

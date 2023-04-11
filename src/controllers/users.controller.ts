@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import bcrypt from 'bcrypt'
 import Working from "../models/working.model";
 import {uploadFileMiddleware} from "../utils/saveImage";
+import {deleteImage} from "../utils/deleteFiles";
 
 const countingTimeWorkInDay = async () => {
     const scheduledNotifications = CronJob.schedule("0 * * * * *", async () => {
@@ -216,7 +217,8 @@ const updateProfile =  async (req: any, res: Response) => {
         await uploadFileMiddleware(req,res)
         const { user } = req
         const { email, phoneNumber , name } = req.body
-        let imageUrl = "images/default.jpg"
+        const userFind = await User.findById(user.id)
+        let imageUrl = userFind?.profilePicture || ""
         if (req?.files?.length) {
             await User.findByIdAndUpdate(user.id,{
                 email:email,
@@ -225,6 +227,8 @@ const updateProfile =  async (req: any, res: Response) => {
                 profilePicture: 'userImages/'+ req?.files[0].filename
             })
             imageUrl= 'userImages/'+ req?.files[0].filename
+            console.log(userFind?.profilePicture);
+            deleteImage(userFind?.profilePicture || '')
         }else {
             await User.findByIdAndUpdate(user.id,{
                 email:email,

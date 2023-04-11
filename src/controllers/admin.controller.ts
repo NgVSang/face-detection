@@ -13,7 +13,6 @@ const MODAL_PATH = path.join(__dirname, 'lib');
 const getListUser = async (req: any, res: Response) => {
     try {
         const { limit = 10,skip = 0 } = req.query
-        console.log(limit);
         const month = '2023-03'
         const listUser = await User.find({
             role: 1
@@ -27,7 +26,7 @@ const getListUser = async (req: any, res: Response) => {
         .select(['baseSalary','name','email','phoneNumber','gender'])
         .limit(limit)
         .skip(skip)
-
+        console.log(listUser);
         return res.status(200).json(response({ result: listUser}, "Success", 1));
     } catch (error: any) {
         return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
