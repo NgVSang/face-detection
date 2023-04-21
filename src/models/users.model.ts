@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import {AttendanceInterface} from './attendance.model';
 import {PayrollInterface} from './payroll.model';
+import {requestInterface} from './request.model';
 import {WorkingInterface} from './working.model';
 
 export interface UserInterface extends Document {
@@ -15,8 +16,10 @@ export interface UserInterface extends Document {
   attendances: string[] | AttendanceInterface[]
   workings: string[] | WorkingInterface[]
   phoneNumber?: string
+  deviceToken: string
   imageTraining: string[]
   faceDescriptors: any[]
+  requests: string[] | requestInterface[]
   createdAt: Date
   updatedAt: Date
 }
@@ -36,6 +39,8 @@ const UserSchema: Schema = new Schema(
     baseSalary: {type: Number, required: false, default: 3500000},
     faceDescriptors: {type: Object,required: false},
     role: { type: Number, required: false, default: 1 },
+    deviceToken: { type: String, required: false, default: '' },
+    requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'request' }]
   },
   { timestamps: true }
 );

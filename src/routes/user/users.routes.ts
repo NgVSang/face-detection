@@ -13,6 +13,7 @@ router.post("/attendance" , userController.attendance)
 router.get("/getAttendance",userController.getAttendance)
 router.get("/getWorking",userController.getWorking)
 router.post("/change-password",userController.changePassword)
+router.post("/request",userController.createRequest)
 router.post(
     "/update-profile",
     userController.updateProfile

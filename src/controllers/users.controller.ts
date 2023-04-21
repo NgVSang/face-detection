@@ -3,6 +3,8 @@ import response from "../utils/response";
 import Attendance from '../models/attendance.model'
 import * as userService from '../services/user.service'
 import User from '../models/users.model'
+import RequestType from "../models/requestType.model"
+import Requests from "../models/request.model"
 import CronJob from 'node-cron'
 import {timeConvert} from "../utils/timeConvert";
 import dayjs from 'dayjs'
@@ -99,7 +101,7 @@ const test = async (req: any, res: Response) => {
 const attendance = async (req: any, res: Response) => {
     try {
         const { user } = req
-        let result 
+        let result: any
         const date = dayjs(new Date()).format("YYYY-MM-DD")
         // const date = "2023-03-29"
         const lastAttendance =  await Attendance.find({
@@ -123,7 +125,8 @@ const attendance = async (req: any, res: Response) => {
                     }
                 }
                 const work = await Working.findOne({
-                    date: date
+                    date: date,
+                    user:user.id
                 })
                 await Working.findByIdAndUpdate(work?._id, {
                     timeWork: time
@@ -242,6 +245,33 @@ const updateProfile =  async (req: any, res: Response) => {
     }
 }
 
+const createRequest = async (req: any, res: Response) => {
+    try {
+        const { user } = req
+        const userFind = await User.findById(user.id || '');
+        const { type, body, date, startTime, endTime } = req.body
+        const typeRequest = await RequestType.findById(type)
+        const result = await Requests.create({
+            ...req.body,
+            user: userFind?._id || ''
+        })
+        await User.findByIdAndUpdate(userFind?.id,{
+            $push: {
+                requests : result._id
+            }
+        })
+        await RequestType.findByIdAndUpdate(typeRequest?.id,{
+            $push: {
+                requests : result._id
+            }
+        })
+        
+        return res.status(200).json(response({result}, "Bạn đã tạo request thành công!", 1));
+    } catch (error: any) {
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
 export {
     attendance,
     countingTimeWorkInDay,
@@ -251,4 +281,5 @@ export {
     getWorking,
     changePassword,
     updateProfile,
+    createRequest
 }

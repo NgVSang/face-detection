@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface WorkingInterface extends Document {
     user: string
-    timeWork: Number
+    timeWork: number
     date: string
     createdAt: Date
     updatedAt: Date

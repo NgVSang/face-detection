@@ -13,5 +13,6 @@ router.post("/login", validator(authValidation.loginSchema, "body"), authControl
 // router.post("/detect", upload.single('file'), authController.faceDetect);
 // router.post("/login",  authController.login);
 router.post("/detect", authController.faceDetect);
+router.post("/detect_api",upload.single('file'), authController.faceDetectApi);
 
 export default router

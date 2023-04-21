@@ -7,6 +7,16 @@ import * as authValidation from '../../validations/auth.validation'
 const router = express.Router();
 
 router.get("/users" , adminController.getListUser);
+router.get("/users-salary" , adminController.getSalary);
+router.get("/user-working/:userId" , adminController.getUserWorkingDetail);
+router.get("/user-attendance/:userId" , adminController.getUserAttendance);
+router.get("/users-request" , adminController.getListRequest);
+
+router.post(
+    "/create-type-request", 
+    adminController.createTypeRequest
+)
+
 router.post(
     "/create-user", 
     validator(authValidation.createUserSchema, "body"), 
@@ -18,9 +28,11 @@ router.post(
 )
 
 router.post(
-    "/training-user/:userId", 
-    adminController.imageTraining
+    "/update-request", 
+    adminController.updateStatusRequest
 )
+
+router.post 
 
 
 export default router
