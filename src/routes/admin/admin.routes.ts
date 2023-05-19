@@ -32,6 +32,11 @@ router.post(
     adminController.updateStatusRequest
 )
 
+router.post(
+    "/manage-salary/:userId", 
+    adminController.manageSalary
+)
+
 router.post 
 
 

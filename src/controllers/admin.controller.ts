@@ -11,6 +11,8 @@ import {__dirname} from "../config";
 import faceapi from 'face-api.js';
 import dayjs from "dayjs";
 import Attendance from "../models/attendance.model";
+import Payroll from "../models/payroll.model";
+import {countWeekdays} from "../utils/timeConvert";
 
 
 const MODAL_PATH = path.join(__dirname, 'lib');
@@ -48,8 +50,14 @@ const getSalary = async (req: any, res: Response) => {
             match: { 
                 date: { $regex: month }
             }
-        })
-        .select(['baseSalary','name','email','phoneNumber','gender','workings'])
+        })   
+        .populate({ 
+            path: 'payrolls',
+            match: { 
+                date: { $regex: month }
+            }
+        })       
+        .select(['baseSalary','name','email','phoneNumber','gender','workings','payrolls'])
 
         const result: any[] = []
         for (let i = 0 ; i < listUser.length ; i++){
@@ -63,7 +71,9 @@ const getSalary = async (req: any, res: Response) => {
             }
             result.push({
                 ...user.toObject(),
-                timeWork
+                timeWork,
+                //@ts-ignore
+                received: user.payrolls.length == 0 ? 0 : user.payrolls[0].totalAmount
             })
         }
         return res.status(200).json(response({ result: result , totalItems: totalItems}, "Success", 1));
@@ -236,6 +246,63 @@ const updateStatusRequest = async (req: Request, res: Response) => {
     }
 }
 
+const manageSalary = async (req: Request, res: Response) => {
+    try {
+        // const month = dayjs(new Date()).format("YYYY-MM")
+        // const month = "2023-04"
+        const { userId } = req.params
+        const { salary, bonus, fined , month} = req.body
+        const day = new Date(month)
+        console.log(month)
+        const user = await User.findById(userId)
+        .populate({ 
+            path: 'workings',
+            match: { 
+                date: { $regex: month }
+            }
+        })
+        .select(['baseSalary','name','email','phoneNumber','gender','workings','payrolls'])
+        let timeWork = 0
+        //@ts-ignore
+        for (let j = 0 ; j < user?.workings?.length ; j++ ){
+            const work = user?.workings[j]
+            if ( typeof(work) === 'object'){
+                timeWork += work.timeWork
+            }
+        }
+
+        // const countDay = countWeekdays(day.getFullYear(),day.getMonth())
+        // console.log(countDay);
+        
+        const payroll = await Payroll.create({
+            totalAmount: parseInt(salary) + parseInt(bonus) || 0,
+            bonus : bonus || 0,
+            fined: fined || 0,
+            user: user?._id,
+            baseSalary: user?.baseSalary,
+            timeWork : timeWork,
+            date: month,
+            // paytime: paytime || dayjs(new Date()).format("YYYY-MM-DD"),
+        })
+        user?.payrolls.push(payroll._id)
+        user?.save()
+        return res.status(200).json(response({payroll}, "Success", 1));
+    } catch (error: any) {
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
+const autoSalaryCost = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params
+        const { requestId, status } = req.body
+        const user = await User.findById(userId)
+        return res.status(200).json(response({}, "Success", 1));
+    } catch (error: any) {
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
 export {
     getListUser,
     testAddImage,
@@ -247,5 +314,7 @@ export {
     getUserAttendance,
     createTypeRequest,
     getListRequest,
-    updateStatusRequest
+    updateStatusRequest,
+    manageSalary,
+    autoSalaryCost
 }
