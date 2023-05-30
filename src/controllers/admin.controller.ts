@@ -12,7 +12,8 @@ import faceapi from 'face-api.js';
 import dayjs from "dayjs";
 import Attendance from "../models/attendance.model";
 import Payroll from "../models/payroll.model";
-import {countWeekdays} from "../utils/timeConvert";
+import {convertDate, countWeekdays} from "../utils/timeConvert";
+import {sendNotification} from "../services/notification.service";
 
 
 const MODAL_PATH = path.join(__dirname, 'lib');
@@ -232,14 +233,34 @@ const getListRequest = async (req: Request, res: Response) => {
 const updateStatusRequest = async (req: Request, res: Response) => {
     try {
         const { requestId, status } = req.body
-        //@ts-ignore
+        const user = await User.findOne({
+            requests: { $in: [requestId] } 
+        })
+        .select("name deviceToken")
+        console.log(user);
+        let request 
         if (status == 0 || status == 2){
-            await Requests.findByIdAndUpdate(requestId,{
+            request = await Requests.findByIdAndUpdate(requestId,{
                 status: parseInt(status)
+            })
+            .populate({
+                path: 'type',
             })
         }else {
             return res.status(200).json(response({}, "Không có trạng thái", 0));
         }
+        console.log(request);
+        let body = "Request của bạn với nội dung " + request.body
+        body += request.date != '' ? " vào ngày " + convertDate(request.date || "") : ""  
+        body += request.startTime != '' ? " lúc " + request.startTime : ""
+        body += request.endTime != '' ? " đến " + request.endTime : ""
+        body += status == 0 ? " bị từ chối": " được chấp nhận" 
+        console.log(body);
+        sendNotification({
+            token: user?.deviceToken,
+            body: body,
+            title: status === 0 ? "Request bị từ chối": "Request được chấp nhận" 
+        })
         return res.status(200).json(response({}, "Success", 1));
     } catch (error: any) {
         return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
@@ -303,6 +324,23 @@ const autoSalaryCost = async (req: Request, res: Response) => {
     }
 }
 
+const testNotification = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.query
+        const user = await User.findById(userId).select("deviceToken")
+        sendNotification({
+            token: user?.deviceToken,
+            title: "Test",
+            body: "Test"
+        })
+        return res.status(200).json(response({user}, "Success", 1));
+    } catch (error: any) {
+        console.log(error);
+        
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
 export {
     getListUser,
     testAddImage,
@@ -316,5 +354,6 @@ export {
     getListRequest,
     updateStatusRequest,
     manageSalary,
-    autoSalaryCost
+    autoSalaryCost,
+    testNotification
 }

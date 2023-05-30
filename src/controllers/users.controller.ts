@@ -245,6 +245,16 @@ const updateProfile =  async (req: any, res: Response) => {
     }
 }
 
+const getAllRequsetType = async (req: any, res: Response) => {
+    try {
+        const typeRequest = await RequestType.find().select("name")
+        
+        return res.status(200).json(response({type:typeRequest}, "Success", 1));
+    } catch (error: any) {
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
 const createRequest = async (req: any, res: Response) => {
     try {
         const { user } = req
@@ -281,5 +291,6 @@ export {
     getWorking,
     changePassword,
     updateProfile,
-    createRequest
+    createRequest,
+    getAllRequsetType
 }

@@ -9,9 +9,11 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.post("/attendance" , userController.attendance)
 router.get("/getAttendance",userController.getAttendance)
 router.get("/getWorking",userController.getWorking)
+router.get("/getRequestType",userController.getAllRequsetType)
+
+router.post("/attendance" , userController.attendance)
 router.post("/change-password",userController.changePassword)
 router.post("/request",userController.createRequest)
 router.post(

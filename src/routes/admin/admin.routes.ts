@@ -11,6 +11,12 @@ router.get("/users-salary" , adminController.getSalary);
 router.get("/user-working/:userId" , adminController.getUserWorkingDetail);
 router.get("/user-attendance/:userId" , adminController.getUserAttendance);
 router.get("/users-request" , adminController.getListRequest);
+router.get("/test-notification",adminController.testNotification)
+
+router.post(
+    "/training-user/:userId", 
+    adminController.imageTraining
+)
 
 router.post(
     "/create-type-request", 

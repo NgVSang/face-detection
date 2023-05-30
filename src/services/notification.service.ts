@@ -1,9 +1,10 @@
-import Expo, {ExpoPushMessage, ExpoPushTicket} from "expo-server-sdk";
+import  {ExpoPushMessage, ExpoPushTicket , Expo} from "expo-server-sdk";
 
 import {notification} from "../types/notification";
 
 export const sendNotification = (data: notification) => {
     console.log(data);
+    //@ts-ignore
     const expo = new Expo();
     let messages: ExpoPushMessage[] = [];
     if (Expo.isExpoPushToken(data.token)) {

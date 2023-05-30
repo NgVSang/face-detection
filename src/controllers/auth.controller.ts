@@ -64,11 +64,11 @@ const faceDetectApi = async (req: Request, res: Response) => {
                     }else {
                         const user = await User.findById(labels[i])
                             .select(['name','email','gender','phoneNumber','deviceToken'])
-                        // sendNotification({
-                        //     token: user?.deviceToken,
-                        //     body: 'Bạn vừa chấm công vào lúc '+ dayjs(new Date()).format('HH:mm:ss') + ' ngày ' + dayjs(new Date()).format('DD/MM/YYYY') ,
-                        //     title: 'Chấm công thành công'
-                        // })
+                        sendNotification({
+                            token: user?.deviceToken,
+                            body: 'Bạn vừa chấm công vào lúc '+ dayjs(new Date()).format('HH:mm:ss') + ' ngày ' + dayjs(new Date()).format('DD/MM/YYYY') ,
+                            title: 'Chấm công thành công'
+                        })
                         listUserDetect.push(user)
                     }
                 }
@@ -114,11 +114,11 @@ const faceDetect = async (req: Request, res: Response) => {
                         }else {
                             const user = await User.findById(labels[i])
                                 .select(['name','email','gender','phoneNumber','deviceToken'])
-                            // sendNotification({
-                            //     token: user?.deviceToken,
-                            //     body: 'Bạn vừa chấm công vào lúc '+ dayjs(new Date()).format('HH:mm:ss') + ' ngày ' + dayjs(new Date()).format('DD/MM/YYYY') ,
-                            //     title: 'Chấm công thành công'
-                            // })
+                            sendNotification({
+                                token: user?.deviceToken,
+                                body: 'Bạn vừa chấm công vào lúc '+ dayjs(new Date()).format('HH:mm:ss') + ' ngày ' + dayjs(new Date()).format('DD/MM/YYYY') ,
+                                title: 'Chấm công thành công'
+                            })
                             listUserDetect.push(user)
                         }
                     }

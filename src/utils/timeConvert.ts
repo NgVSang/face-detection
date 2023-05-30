@@ -21,4 +21,7 @@ export const countWeekdays = (year: number, month: number) => {
   
     return count;
   }
-  
+
+export const convertDate = (date: string) => {
+  return date.split("-").reverse().join("/")
+}
