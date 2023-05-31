@@ -9,6 +9,7 @@ import {SECRET_KEY, __dirname} from "../config"
 import path from "path"
 import {sendNotification} from "../services/notification.service"
 import dayjs from "dayjs"
+import AttenDanceService from "../services/attendance.service"
 
 
 const MODAL_PATH = path.join(__dirname, 'lib');
@@ -119,6 +120,7 @@ const faceDetect = async (req: Request, res: Response) => {
                                 body: 'Bạn vừa chấm công vào lúc '+ dayjs(new Date()).format('HH:mm:ss') + ' ngày ' + dayjs(new Date()).format('DD/MM/YYYY') ,
                                 title: 'Chấm công thành công'
                             })
+                            await AttenDanceService.attendance(user)
                             listUserDetect.push(user)
                         }
                     }

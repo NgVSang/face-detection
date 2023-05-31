@@ -1531,3 +1531,8 @@
 ::ffff:127.0.0.1 - - [30/May/2023:08:38:26 +0000] "GET /api/admin/users-request HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36"
 ::ffff:127.0.0.1 - - [30/May/2023:08:38:29 +0000] "GET /api/admin/users-salary?month=2023-05 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36"
 ::ffff:127.0.0.1 - - [30/May/2023:08:38:33 +0000] "GET /api/admin/users-request HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36"
+::1 - - [31/May/2023:02:46:20 +0000] "POST /api/auth/login HTTP/1.1" 200 753 "-" "PostmanRuntime/7.29.3"
+::1 - - [31/May/2023:02:46:48 +0000] "POST /api/auth/detect HTTP/1.1" 200 446 "-" "PostmanRuntime/7.29.3"
+::1 - - [31/May/2023:02:47:18 +0000] "GET /api/user/getAttendance?date=2023-05-31 HTTP/1.1" 200 420 "-" "PostmanRuntime/7.29.3"
+::1 - - [31/May/2023:02:48:05 +0000] "POST /api/auth/detect HTTP/1.1" 200 249 "-" "PostmanRuntime/7.29.3"
+::1 - - [31/May/2023:02:48:10 +0000] "GET /api/user/getAttendance?date=2023-05-31 HTTP/1.1" 200 604 "-" "PostmanRuntime/7.29.3"
