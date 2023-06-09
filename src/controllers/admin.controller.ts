@@ -145,6 +145,30 @@ const createUser = async (req: Request, res: Response) => {
     }
 }
 
+const updateUser = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params
+        if (req.body.password){
+            const hashedPassword = await bcrypt.hash(req.body.password, 10);
+            const user = await User.findByIdAndUpdate(userId,{
+                ...req.body,
+                password: hashedPassword,
+            })
+            return res.status(200).json(response({ user: user}, "Success", 1));
+        }else{
+            const user = await User.findByIdAndUpdate(userId,{
+                phoneNumber: req.body.phoneNumber,
+                email: req.body.email,
+                name: req.body.name,
+            })
+            return res.status(200).json(response({ user: user}, "Success", 1));
+        }
+    } catch (error: any) {
+        console.log("here");
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
 const addImageForUser = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params
@@ -171,15 +195,8 @@ const imageTraining =async (req: Request, res: Response) => {
         const user = await User.findById(userId)
         const descriptors:any[] = []
         if (user){
-            await Promise.all([
-                faceapi.nets.ssdMobilenetv1.loadFromDisk(MODAL_PATH),
-                faceapi.nets.faceLandmark68Net.loadFromDisk(MODAL_PATH),
-                faceapi.nets.faceRecognitionNet.loadFromDisk(MODAL_PATH),
-            ]);
             console.log('Loading training data...');
             for (let i = 0; i < user.imageTraining.length ; i ++){
-                // for (let i = 0; i < 1 ; i ++){
-                // arr.push(path.join(__dirname, 'src/public/userImages/',user.imageTraining[i]))
                 const img = await loadImage(path.join(__dirname, 'public/userImages/',user.imageTraining[i]))
                 // @ts-ignore
                 const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
@@ -282,7 +299,7 @@ const manageSalary = async (req: Request, res: Response) => {
                 date: { $regex: month }
             }
         })
-        .select(['baseSalary','name','email','phoneNumber','gender','workings','payrolls'])
+        .select(['baseSalary','name','email','phoneNumber','gender','workings','payrolls','deviceToken'])
         let timeWork = 0
         //@ts-ignore
         for (let j = 0 ; j < user?.workings?.length ; j++ ){
@@ -307,6 +324,11 @@ const manageSalary = async (req: Request, res: Response) => {
         })
         user?.payrolls.push(payroll._id)
         user?.save()
+        sendNotification({
+            token: user?.deviceToken,
+            body: "Lương tháng này bạn được " + (parseInt(salary) + parseInt(bonus) - parseInt(fined) || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+            title: "Thông báo về lương tháng " + dayjs(day).format("MM/YYYY")
+        })
         return res.status(200).json(response({payroll}, "Success", 1));
     } catch (error: any) {
         return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
@@ -346,6 +368,7 @@ export {
     testAddImage,
     addImageForUser,
     createUser,
+    updateUser,
     imageTraining,
     getSalary,
     getUserWorkingDetail,

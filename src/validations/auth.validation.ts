@@ -22,8 +22,16 @@ const updateUserSchema = Joi.object({
     phoneNumber: Joi.string().trim().required().pattern(/^(\+84|84|0){1}([3|5|7|8|9]){1}([0-9]{8})$/),
 });
 
+const adminUpdateUserSchema = Joi.object({
+    name: Joi.string().trim().required(),
+    email: Joi.string().trim().email().required(),
+    phoneNumber: Joi.string().trim().required().pattern(/^(\+84|84|0){1}([3|5|7|8|9]){1}([0-9]{8})$/),
+    password: Joi.string().trim().min(6),
+});
+
 export  {
     loginSchema,
     createUserSchema,
-    updateUserSchema
+    updateUserSchema,
+    adminUpdateUserSchema
 };

@@ -10,7 +10,6 @@ import { CLIENT_URL, PORT } from './config';
 import { accessLogStream } from './configs';
 import { ENVIRONMENT } from './utils/secrets';
 import { ENV } from './constants';
-import { detectFace } from './utils/face-recognition';
 import { connectDatabase } from './configs/db.config';
 import { errorConverter, handleError, handleNotFound } from './middlewares/error.middleware';
 import apiRoutes from './routes/index.routes';
@@ -31,15 +30,7 @@ app.use(compression({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined', { stream: accessLogStream }));
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-app.post('/detect', upload.single('file'), async (req, res, next) => {
-    let labels = [];
-    if (req.file?.buffer) {
-        labels = await detectFace(req.file?.buffer);
-    }
-    res.json(labels);
-});
+
 app.use("/api", apiRoutes);
 app.use(errorConverter);
 app.use(handleError);

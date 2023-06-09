@@ -12,6 +12,7 @@ import bcrypt from 'bcrypt'
 import Working from "../models/working.model";
 import {uploadFileMiddleware} from "../utils/saveImage";
 import {deleteImage} from "../utils/deleteFiles";
+import Payroll from "../models/payroll.model";
 
 const countingTimeWorkInDay = async () => {
     const scheduledNotifications = CronJob.schedule("0 * * * * *", async () => {
@@ -282,6 +283,37 @@ const createRequest = async (req: any, res: Response) => {
     }
 }
 
+const getListRequest = async (req: any, res: Response) => {
+    try {
+        const { user } = req
+        const requests = await Requests.find({
+            user: user.id
+        })
+        .populate({
+            path: 'type',
+        })
+        .sort({createdAt:'desc'})
+        
+        return res.status(200).json(response({requests}, "Success", 1));
+    } catch (error: any) {
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
+const getSalary = async (req: any, res: Response) => {
+    try {
+        const { user } = req
+        const { month } = req.query
+        const payroll = await Payroll.findOne({
+            date: month,
+            user: user.id
+        })
+        return res.status(200).json(response({payroll}, "Success", 1));
+    } catch (error: any) {
+        return res.status(500).json(response({}, error.message || "Lỗi máy chủ", 0));
+    }
+}
+
 export {
     attendance,
     countingTimeWorkInDay,
@@ -292,5 +324,7 @@ export {
     changePassword,
     updateProfile,
     createRequest,
-    getAllRequsetType
+    getAllRequsetType,
+    getListRequest,
+    getSalary
 }

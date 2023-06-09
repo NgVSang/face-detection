@@ -28,6 +28,13 @@ router.post(
     validator(authValidation.createUserSchema, "body"), 
     adminController.createUser
 )
+
+router.post(
+    "/update-user/:userId", 
+    validator(authValidation.adminUpdateUserSchema, "body"), 
+    adminController.updateUser
+)
+
 router.post(
     "/add-image-user/:userId", 
     adminController.addImageForUser
@@ -42,8 +49,5 @@ router.post(
     "/manage-salary/:userId", 
     adminController.manageSalary
 )
-
-router.post 
-
 
 export default router

@@ -1,10 +1,7 @@
 import  {ExpoPushMessage, ExpoPushTicket , Expo} from "expo-server-sdk";
-
 import {notification} from "../types/notification";
 
 export const sendNotification = (data: notification) => {
-    console.log(data);
-    //@ts-ignore
     const expo = new Expo();
     let messages: ExpoPushMessage[] = [];
     if (Expo.isExpoPushToken(data.token)) {
@@ -16,11 +13,6 @@ export const sendNotification = (data: notification) => {
             data: {
                 status: 1,
                 message: "Success",
-                // detail: {
-                //     notiId: data.id,
-                //     type: data.type,
-                //     license_plates: data.data,
-                // },
             },
         });
     }

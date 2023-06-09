@@ -3,6 +3,7 @@ import cors from 'cors';
 import compression from 'compression';
 import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
+import faceapi from 'face-api.js';
 import morgan from 'morgan';
 import multer from 'multer';
 import errorHandler from 'errorhandler';
@@ -10,12 +11,19 @@ import { CLIENT_URL, PORT, __dirname } from './config';
 import { accessLogStream } from './configs';
 import { ENVIRONMENT } from './utils/secrets';
 import { ENV } from './constants';
-import { detectFace, init } from './utils/face-recognition';
 import {connectDatabase} from './configs/db.config';
 import {errorConverter, handleError, handleNotFound} from './middlewares/error.middleware';
 import apiRoutes from './routes/index.routes'
 import {monkeyPatchFaceApiEnv} from './utils/monkeyPatch';
 import path from 'path';
+
+const MODAL_PATH = path.join(__dirname, 'lib');
+
+Promise.all([
+  faceapi.nets.ssdMobilenetv1.loadFromDisk(MODAL_PATH),
+  faceapi.nets.faceLandmark68Net.loadFromDisk(MODAL_PATH),
+  faceapi.nets.faceRecognitionNet.loadFromDisk(MODAL_PATH),
+]);
 
 const app = express();
 app.use(cors());
@@ -44,20 +52,6 @@ app.use(express.static(path.join(__dirname + "/public")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('combined', { stream: accessLogStream }));
-
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-app.post('/detect', upload.single('file'), async (req: Request, res: Response, next: NextFunction) => {
-  let labels: string[] = [];
-
-  if (req.file?.buffer) {
-    labels = await detectFace(req.file?.buffer);
-  }
-
-  res.json(labels);
-});
 
 //routes
 app.use("/api", apiRoutes);

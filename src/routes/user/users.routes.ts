@@ -11,7 +11,9 @@ const upload = multer({ storage });
 
 router.get("/getAttendance",userController.getAttendance)
 router.get("/getWorking",userController.getWorking)
+router.get("/list-request",userController.getListRequest)
 router.get("/getRequestType",userController.getAllRequsetType)
+router.get("/salary",userController.getSalary)
 
 router.post("/attendance" , userController.attendance)
 router.post("/change-password",userController.changePassword)
